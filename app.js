@@ -18,15 +18,39 @@ const articleSchema = new Schema({
 
 const Article = Mongoose.model("Article", articleSchema);
 
-app.get("/articles", (req, res) => {
-    Article.find()
-        .then((foundArticles) => {
-            res.send(foundArticles);
-        })
-        .catch((err) => {
-            res.send(err);
+app.route("/articles")
+    .get((_req, res) => {
+        Article.find()
+            .then((foundArticles) => {
+                res.send(foundArticles);
+            })
+            .catch((err) => {
+                res.send(err);
+            });
+    })
+    .post((req, res) => {
+        const newArticle = Article({
+            title: req.body.title,
+            content: req.body.content
         });
-});
+
+        newArticle.save()
+            .then(() => {
+                res.send("Successfully saved article to database.");
+            })
+            .catch((err) => {
+                res.send(err);
+            });
+    })
+    .delete((_req, res) => {
+        Article.deleteMany()
+            .then(() => {
+                res.send("Deleted all the articles from the database.");
+            })
+            .catch((err) => {
+                res.send(err);
+            });
+    });
 
 app.listen(3000, () => {
     console.log("Server started on port 3000");
